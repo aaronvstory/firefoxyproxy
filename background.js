@@ -37,9 +37,9 @@ class ProxyManager {
                 this.config = result.proxyConfig;
             } else {
                 this.config = {
-                    username: '85644296-zone-custom',
-                    password: '9VTOEdg9',
-                    endpoint: 'na.proxys5.net', 
+                    username: '', // user-supplied
+                    password: '', // user-supplied
+                    endpoint: 'na.proxys5.net',
                     port: 6200,
                     region: 'US',
                     proxyCount: 10

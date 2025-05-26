@@ -11,10 +11,11 @@ class FoxyProxyGenerator {
       proxyCount: 10              // Default number of proxies
     }, config);
     
-    // Credentials object (only username/password)
+    // Credentials object (only username/password). Values should be provided
+    // by the user through the extension UI.
     this.credentials = {
-      username: '85644296-zone-custom', // Default placeholder, will be overridden
-      password: ''                      // Will be set from credentials form
+      username: '',
+      password: ''
     };
 
     // Predefined colors for proxies
@@ -62,9 +63,9 @@ class FoxyProxyGenerator {
     const colorIndex = index % this.colors.length;
     const iconIndex = index % this.icons.length;
     
-    // Get credentials (simplified to just username/password)
-    let username = this.credentials.username || '85644296-zone-custom';
-    let password = this.credentials.password || '9VTOEdg9';
+    // Get credentials provided by the user
+    let username = this.credentials.username;
+    let password = this.credentials.password;
     
     // Ensure correct username format with session ID for uniqueness
     const authUsername = `${username}-region-${this.config.region}-sessid-${sessionId}-sessTime-15`;

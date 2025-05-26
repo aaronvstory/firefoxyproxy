@@ -22,7 +22,8 @@ A Firefox extension for managing 922proxy service connections through FoxyProxy.
 ## Usage
 
 1. Click the extension icon to open the popup
-2. Enter your 922proxy credentials
+2. Enter your 922proxy credentials. The extension no longer ships with
+   built-in credentials, so you must supply your own username and password.
 3. Click "Generate New Proxies" to create proxy configurations
 4. Download the configuration file
 5. Import the configuration into FoxyProxy
