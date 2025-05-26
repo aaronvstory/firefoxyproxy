@@ -27,13 +27,31 @@ A Firefox extension for managing 922proxy service connections through FoxyProxy.
 4. Download the configuration file
 5. Import the configuration into FoxyProxy
 
-## Development
+## Development / Packaging
 
-To modify this extension:
+### Modifying the extension
 
 1. Clone the repository
 2. Make your changes
 3. Test in Firefox using the temporary add-on loading method
+
+### Packaging the extension
+
+The extension can be bundled for distribution using [web-ext](https://extensionworkshop.com/documentation/develop/web-ext-command-reference/).
+
+1. Install `web-ext`:
+
+   ```bash
+   npm install --global web-ext
+   ```
+
+2. Run the build command from the project root:
+
+   ```bash
+   web-ext build
+   ```
+
+   The resulting `.zip` file in the `web-ext-artifacts` directory can be uploaded to the Firefox Add-on portal.
 
 ## License
 
