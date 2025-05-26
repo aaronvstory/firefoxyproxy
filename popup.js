@@ -620,48 +620,6 @@ class PopupManager {
         }
     }
     
-    // Validate credentials - simplified to just check if username and password are present
-    validateCredentials(credentials) {
-        return !!(credentials && credentials.username && credentials.password);
-    }
-
-    // Update the UI based on credential status
-    updateCredentialStatus() {
-        const credentialStatus = document.getElementById('credentialStatus');
-        const generateBtn = document.getElementById('generateBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const dataUsage = document.getElementById('dataUsage');
-        
-        if (this.credentialsValid) {
-            if (credentialStatus) {
-                credentialStatus.innerHTML = '<span class="success">✓ Valid credentials</span>';
-                credentialStatus.style.display = 'block';
-            }
-            
-            // Enable proxy generation buttons
-            if (generateBtn) generateBtn.disabled = false;
-            if (downloadBtn) downloadBtn.disabled = false;
-            
-            // Show data usage if available
-            if (dataUsage) {
-                dataUsage.style.display = 'block';
-            }
-        } else {
-            if (credentialStatus) {
-                credentialStatus.innerHTML = '<span class="error">⚠️ Please add your 922proxy credentials</span><br><small>Enter your username/password to generate proxies</small>';
-                credentialStatus.style.display = 'block';
-            }
-            
-            // Disable proxy generation buttons
-            if (generateBtn) generateBtn.disabled = true;
-            if (downloadBtn) downloadBtn.disabled = true;
-            
-            // Hide data usage
-            if (dataUsage) {
-                dataUsage.style.display = 'none';
-            }
-        }
-    }
     // Logout from proxy account (remove credentials)
     async logoutProxy() {
         try {
