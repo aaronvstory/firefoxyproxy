@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>922Proxy Smart Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            width: 450px;
+            height: 1500px;
+            padding: 15px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) fixed;
+            background-size: 100% 100%;
+            color: white;
+            margin: 0;
+            overflow-y: auto;
+            letter-spacing: 0.2px;
+            line-height: 1.4;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .version {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title svg {
+            margin-right: 8px;
+        }
+
+        .button {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.3px;
+        }
+
+        .button:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .button.primary {
+            background: rgba(76, 175, 80, 0.8);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .button.primary:hover {
+            background: rgba(76, 175, 80, 0.9);
+        }
+
+        .mini-btn {
+            padding: 5px 8px;
+            margin: 0 0 0 5px;
+            height: 38px;
+            width: 38px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .button-icon {
+            margin-right: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .container-list {
+            max-height: 600px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+
+        .container-item {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 6px 0;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .container-item:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .container-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .container-actions {
+            display: flex;
+            margin-left: auto;
+        }
+
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            min-width: unset;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .delete-btn:hover {
+            background: rgba(244, 67, 54, 0.5);
+            border-color: rgba(244, 67, 54, 0.8);
+        }
+
+        .container-header-controls {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .danger-btn {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .danger-btn:hover {
+            background: rgba(244, 67, 54, 0.5);
+            border-color: rgba(244, 67, 54, 0.8);
+        }
+
+        .credential-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.15);
+            text-align: center;
+            font-size: 13px;
+            font-weight: 400;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .credential-status .error {
+            color: #FFCDD2;
+            font-weight: 500;
+        }
+
+        .credential-status .success {
+            color: #C8E6C9;
+            font-weight: 500;
+        }
+
+        .account-link {
+            display: block;
+            margin-top: 12px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .account-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .data-usage {
+            margin-top: 12px;
+            padding: 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .usage-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .usage-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #8BC34A, #4CAF50);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .container-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .container-name {
+            font-weight: bold;
+            color: #fff;
+            flex: 1;
+        }
+
+        .proxy-info {
+            color: rgba(255,255,255,0.9);
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        .proxy-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .success-msg, .error-msg {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-msg {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .error-msg {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .config-options {
+            margin: 10px 0;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .form-row label {
+            flex: 0 0 120px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        .form-row input, .form-row select {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .form-row input:focus, .form-row select:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) inset;
+        }
+
+        .form-row input::placeholder, .form-row select::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">922Proxy Smart Manager</div>
+        <div class="version">v3.0 - FoxyProxy Edition</div>
+    </div>
+
+    <!-- FoxyProxy Generator Section -->
+    <div class="card">
+        <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM17 13H13V17H11V13H7V11H11V7H13V11H17V13Z" fill="white"/>
+            </svg>
+            FoxyProxy Configuration
+        </div>
+
+        <div class="config-options">
+            <div class="form-row">
+                <label for="proxyCount">Proxy Count:</label>
+                <select id="proxyCount">
+                    <option value="5">5 Proxies</option>
+                    <option value="10" selected>10 Proxies</option>
+                    <option value="15">15 Proxies</option>
+                    <option value="20">20 Proxies</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="proxyRegion">Region:</label>
+                <select id="proxyRegion">
+                    <option value="US" selected>USA</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="generateBtn" class="button primary">
+                <span class="button-icon">🔄</span> Generate New Proxies
+            </button>
+            <button id="downloadBtn" class="button">
+                <span class="button-icon">💾</span> Download Config
+            </button>
+        </div>
+
+        <div id="successMsg" class="success-msg">
+            Configuration generated successfully!
+        </div>
+
+        <div id="errorMsg" class="error-msg">
+            Error generating configuration.
+        </div>
+    </div>
+
+    <!-- Container Management Section -->
+    <div class="card">
+        <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM5 19V5H19V19H5Z" fill="white"/>
+                <path d="M7 7H9V9H7V7Z" fill="white"/>
+                <path d="M11 7H17V9H11V7Z" fill="white"/>
+                <path d="M7 11H9V13H7V11Z" fill="white"/>
+                <path d="M11 11H17V13H11V11Z" fill="white"/>
+                <path d="M7 15H9V17H7V15Z" fill="white"/>
+                <path d="M11 15H17V17H11V15Z" fill="white"/>
+            </svg>
+            Container Management
+        </div>
+
+        <div class="container-header-controls">
+            <button id="deleteAllContainersBtn" class="button danger-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px;">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                </svg>
+                Delete All Containers
+            </button>
+        </div>
+
+        <div id="loadingContainers" class="loading">
+            <div class="spinner"></div>
+            <div>Loading containers...</div>
+        </div>
+
+        <div id="containerList" class="container-list">
+            <!-- Container items will be added here -->
+        </div>
+
+        <div id="emptyState" style="text-align: center; padding: 20px; display: none;">
+            <div>No containers found.</div>
+        </div>
+
+        <div class="button-group">
+            <button id="newContainerBtn" class="button">
+                <span class="button-icon">➕</span> New Container
+            </button>
+            <button id="refreshBtn" class="button">
+                <span class="button-icon">🔄</span> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- 922Proxy Settings Section -->
+    <div class="card">
+        <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="white"/>
+            </svg>
+            922Proxy Settings
+        </div>
+
+        <div class="config-options">
+            <div class="form-row">
+                <label for="proxyUsername">Username:</label>
+                <input type="text" id="proxyUsername" placeholder="Your 922proxy username" />
+            </div>
+            <div class="form-row">
+                <label for="proxyPassword">Password:</label>
+                <div class="password-container" style="display: flex; flex: 1;">
+                    <input type="password" id="proxyPassword" placeholder="Your 922proxy password" style="flex: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; margin-right: 0;" />
+                    <button id="showPasswordBtn" class="button mini-btn" type="button" title="Show/Hide Password" style="border-top-left-radius: 0; border-bottom-left-radius: 0; background: rgba(255,255,255,0.2);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="credentialStatus" class="credential-status">
+                <!-- Credential status will be displayed here -->
+            </div>
+            <div id="dataUsage" class="data-usage" style="display: none;">
+                <div><strong>Data Plan Usage</strong></div>
+                <div class="usage-bar">
+                    <div id="usageProgress" class="usage-progress"></div>
+                </div>
+                <div id="usageText">Checking data usage...</div>
+            </div>
+            <a href="https://center.922proxy.com/Dashboard/TrafficSetup" target="_blank" class="account-link">
+                <span class="button-icon">📊</span> Access 922proxy Traffic Setup
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+            <button id="saveCredentialsBtn" class="button primary">
+                <span class="button-icon">💾</span> Save Credentials
+            </button>
+            <button id="logoutBtn" class="button">
+                <span class="button-icon">🚪</span> Log Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Setup Instructions -->
+    <div class="card">
+        <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 19H11V17H13V19ZM15.07 11.25L14.17 12.17C13.45 12.9 13 13.5 13 15H11V14.5C11 13.4 11.45 12.4 12.17 11.67L13.41 10.41C13.78 10.05 14 9.55 14 9C14 7.9 13.1 7 12 7C10.9 7 10 7.9 10 9H8C8 6.79 9.79 5 12 5C14.21 5 16 6.79 16 9C16 9.88 15.64 10.68 15.07 11.25Z" fill="white"/>
+            </svg>
+            Instructions
+        </div>
+
+        <ol style="margin-left: -15px; font-size: 13px; line-height: 1.4;">
+            <li>Click <strong>Generate New Proxies</strong> to create unique proxy configurations</li>
+            <li>Click <strong>Download Config</strong> to save the FoxyProxy configuration file</li>
+            <li>In Firefox, open FoxyProxy and import the downloaded configuration file</li>
+            <li>Use <strong>New Container</strong> to create Firefox containers</li>
+            <li>Open websites in containers to view your proxy connection details</li>
+        </ol>
+
+        <div style="text-align: center; margin-top: 10px;">
+            <button id="setupFoxyProxyBtn" class="button">
+                <span class="button-icon">🦊</span> Setup FoxyProxy
+            </button>
+        </div>
+    </div>
+
+    <script src="foxyproxy-generator.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>

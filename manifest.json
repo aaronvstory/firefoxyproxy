@@ -1,0 +1,48 @@
+{
+  "manifest_version": 2,
+  "name": "922Proxy FoxyProxy Generator",
+  "version": "3.0",
+  "description": "Generates FoxyProxy configurations with 922proxy USA residential proxies and manages Firefox containers",
+  
+  "permissions": [
+    "contextualIdentities",
+    "cookies",
+    "storage",
+    "activeTab",
+    "tabs",
+    "downloads",
+    "webRequest",
+    "webRequestBlocking",
+    "proxy",
+    "management",
+    "notifications",
+    "<all_urls>"
+  ],
+  
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  
+  "browser_action": {
+    "default_title": "922Proxy FoxyProxy Generator",
+    "default_popup": "popup.html",
+    "default_icon": "icon.svg"
+  },
+  
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon.svg"
+  },
+  
+  "options_ui": {
+    "page": "foxyproxy-setup.html",
+    "open_in_tab": true
+  },
+  
+  "web_accessible_resources": [
+    "foxyproxy-generator.js",
+    "*.png"
+  ]
+}
