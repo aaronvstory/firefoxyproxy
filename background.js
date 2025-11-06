@@ -1,7 +1,13 @@
 // Background Script for 922Proxy FoxyProxy Generator
 // Version 3.0
 
-console.log('🚀 922Proxy Background Script Starting...');
+const DEBUG = false; // Set to true for verbose logging
+
+function logInfo(message, ...args) {
+    if (DEBUG) console.log(`[922Proxy] ${message}`, ...args);
+}
+
+logInfo('Background script starting...');
 
 class ProxyManager {
     constructor() {
@@ -12,20 +18,20 @@ class ProxyManager {
 
     async init() {
         try {
-            console.log('📦 Initializing 922Proxy FoxyProxy Generator...');
-            
+            logInfo('Initializing proxy manager...');
+
             // Load configuration
             await this.loadConfig();
-            
+
             // Set up message listener
             browser.runtime.onMessage.addListener(this.handleMessage.bind(this));
-            
+
             // Set up event listeners
             this.setupEventListeners();
-            
-            console.log('✅ 922Proxy Manager initialized!');
+
+            logInfo('Proxy manager initialized successfully');
         } catch (error) {
-            console.error('❌ Initialization error:', error);
+            console.error('[922Proxy] Initialization error:', error);
         }
     }
 
@@ -46,9 +52,9 @@ class ProxyManager {
                 };
                 await this.saveConfig();
             }
-            console.log('📄 Configuration loaded');
+            logInfo('Configuration loaded');
         } catch (error) {
-            console.error('❌ Error loading config:', error);
+            console.error('[922Proxy] Error loading config:', error);
         }
     }
 
@@ -56,7 +62,7 @@ class ProxyManager {
         try {
             await browser.storage.local.set({proxyConfig: this.config});
         } catch (error) {
-            console.error('❌ Error saving config:', error);
+            console.error('[922Proxy] Error saving config:', error);
         }
     }
 
@@ -66,16 +72,16 @@ class ProxyManager {
             browser.contextualIdentities.onCreated.addListener(this.handleContainerCreated.bind(this));
             browser.contextualIdentities.onRemoved.addListener(this.handleContainerRemoved.bind(this));
         }
-        
+
         // Tab events
         browser.tabs.onCreated.addListener(this.handleTabCreated.bind(this));
         browser.tabs.onUpdated.addListener(this.handleTabUpdated.bind(this));
-        
-        console.log('🎧 Event listeners set up');
+
+        logInfo('Event listeners configured');
     }
 
     async handleContainerCreated(container) {
-        console.log(`📦 Container created: ${container.name}`);
+        logInfo(`Container created: ${container.name}`);
         // Store initial container info
         this.containerInfo.set(container.cookieStoreId, {
             name: container.name,
@@ -88,7 +94,7 @@ class ProxyManager {
     }
 
     async handleContainerRemoved(container) {
-        console.log(`🗑️ Container removed: ${container.name}`);
+        logInfo(`Container removed: ${container.name}`);
         this.containerInfo.delete(container.cookieStoreId);
     }
 
@@ -114,7 +120,7 @@ class ProxyManager {
                         });
                     }
                 } catch (error) {
-                    console.error('Error getting container info:', error);
+                    console.error('[922Proxy] Error getting container info:', error);
                 }
             }
         }
@@ -159,30 +165,30 @@ class ProxyManager {
                                             org: info.org || '',
                                             detected: Date.now()
                                         };
-                                        
+
                                         // Send IP info back to background script
                                         browser.runtime.sendMessage({
                                             action: 'updateIpInfo',
                                             cookieStoreId: '${cookieStoreId}',
                                             ipInfo: ipInfo
                                         });
-                                        
+
                                         return ipInfo;
                                     });
                             })
                             .catch(error => {
-                                console.error('IP detection error:', error);
+                                console.error('[922Proxy] IP detection error:', error);
                             });
                     }
                 `
             });
         } catch (error) {
-            console.error('Error injecting IP detection script:', error);
+            console.error('[922Proxy] Error injecting IP detection script:', error);
         }
     }
 
     handleMessage(message, sender, sendResponse) {
-        console.log('📨 Message received:', message.action);
+        logInfo('Message received:', message.action);
         
         switch (message.action) {
             case 'getConfig':
@@ -225,7 +231,7 @@ class ProxyManager {
                 break;
                 
             default:
-                console.warn('Unknown message action:', message.action);
+                console.warn('[922Proxy] Unknown message action:', message.action);
                 sendResponse({ success: false, error: 'Unknown action' });
         }
     }

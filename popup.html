@@ -8,7 +8,8 @@
     <style>
         body {
             width: 450px;
-            height: 1500px;
+            min-height: 600px;
+            max-height: 1500px;
             padding: 15px;
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 14px;
@@ -243,30 +244,6 @@
             text-decoration: underline;
         }
 
-        .data-usage {
-            margin-top: 12px;
-            padding: 8px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            text-align: center;
-        }
-
-        .usage-bar {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            margin: 8px 0;
-            overflow: hidden;
-        }
-
-        .usage-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #8BC34A, #4CAF50);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
         .container-color {
             width: 12px;
             height: 12px;
@@ -485,14 +462,14 @@
         <div class="config-options">
             <div class="form-row">
                 <label for="proxyUsername">Username:</label>
-                <input type="text" id="proxyUsername" placeholder="Your 922proxy username" />
+                <input type="text" id="proxyUsername" placeholder="Your 922proxy username" autocomplete="username" />
             </div>
             <div class="form-row">
                 <label for="proxyPassword">Password:</label>
                 <div class="password-container" style="display: flex; flex: 1;">
-                    <input type="password" id="proxyPassword" placeholder="Your 922proxy password" style="flex: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; margin-right: 0;" />
-                    <button id="showPasswordBtn" class="button mini-btn" type="button" title="Show/Hide Password" style="border-top-left-radius: 0; border-bottom-left-radius: 0; background: rgba(255,255,255,0.2);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <input type="password" id="proxyPassword" placeholder="Your 922proxy password" autocomplete="current-password" style="flex: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; margin-right: 0;" />
+                    <button id="showPasswordBtn" class="button mini-btn" type="button" title="Show/Hide Password" aria-label="Toggle password visibility" style="border-top-left-radius: 0; border-bottom-left-radius: 0; background: rgba(255,255,255,0.2);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
@@ -501,13 +478,6 @@
             </div>
             <div id="credentialStatus" class="credential-status">
                 <!-- Credential status will be displayed here -->
-            </div>
-            <div id="dataUsage" class="data-usage" style="display: none;">
-                <div><strong>Data Plan Usage</strong></div>
-                <div class="usage-bar">
-                    <div id="usageProgress" class="usage-progress"></div>
-                </div>
-                <div id="usageText">Checking data usage...</div>
             </div>
             <a href="https://center.922proxy.com/Dashboard/TrafficSetup" target="_blank" class="account-link">
                 <span class="button-icon">📊</span> Access 922proxy Traffic Setup

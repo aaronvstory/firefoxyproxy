@@ -1,6 +1,17 @@
 // Enhanced Popup Script for 922Proxy Smart Container Manager
 // FoxyProxy Edition v3.0
 
+// Constants
+const DEFAULT_IP_CHECK_URL = 'https://ipinfo.io/what-is-my-ip';
+const IPIFY_API_URL = 'https://api.ipify.org/?format=json';
+const IPINFO_API_URL = 'https://ipinfo.io';
+const IPAPI_FALLBACK_URL = 'https://ipapi.co/json/';
+const DEBUG = false; // Set to true for verbose logging
+
+function logInfo(message, ...args) {
+    if (DEBUG) console.log(`[922Proxy] ${message}`, ...args);
+}
+
 class PopupManager {
     constructor() {
         this.containers = [];
@@ -13,8 +24,8 @@ class PopupManager {
     }
 
     async init() {
-        console.log('🎛️ Initializing popup interface...');
-        
+        logInfo('Initializing popup interface...');
+
         // Set up event listeners
         this.setupEventListeners();
         
@@ -36,10 +47,10 @@ class PopupManager {
             const result = await browser.storage.local.get('foxyProxyConfig');
             if (result.foxyProxyConfig) {
                 this.currentConfig = result.foxyProxyConfig;
-                console.log('Loaded saved FoxyProxy config');
+                logInfo('Loaded saved FoxyProxy config');
             }
         } catch (error) {
-            console.error('Error loading saved config:', error);
+            console.error('[922Proxy] Error loading saved config:', error);
         }
     }
 
@@ -144,7 +155,7 @@ class PopupManager {
             
             return this.currentConfig;
         } catch (error) {
-            console.error('Error generating proxy config:', error);
+            console.error('[922Proxy] Error generating proxy config:', error);
             this.showMessage('error', `Error: ${error.message}`);
             
             // Re-enable button
@@ -173,7 +184,7 @@ class PopupManager {
             this.proxyGenerator.downloadConfig();
             this.showMessage('success', 'Configuration downloaded successfully!');
         } catch (error) {
-            console.error('Error downloading configuration:', error);
+            console.error('[922Proxy] Error downloading configuration:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
@@ -209,7 +220,7 @@ class PopupManager {
             // Start periodic IP detection (every 30 seconds)
             this.startPeriodicIPDetection();
         } catch (error) {
-            console.error('Error loading containers:', error);
+            console.error('[922Proxy] Error loading containers:', error);
             this.showContainerError();
             document.getElementById('loadingContainers').style.display = 'none';
         }
@@ -248,11 +259,11 @@ class PopupManager {
                     <div class="container-color" style="background-color: ${container.colorCode || '#1a73e8'}"></div>
                     <div class="container-name">${container.name}</div>
                     <div class="container-actions">
-                        <button class="button action-btn" data-container-id="${container.cookieStoreId}" id="refreshIpBtn-${container.cookieStoreId}" title="Refresh IP">
-                            <span style="font-size: 16px;">↻</span>
+                        <button class="button action-btn" data-container-id="${container.cookieStoreId}" id="refreshIpBtn-${container.cookieStoreId}" title="Refresh IP" aria-label="Refresh IP address for ${container.name}">
+                            <span style="font-size: 16px;" aria-hidden="true">↻</span>
                         </button>
-                        <button class="button action-btn delete-btn" data-container-id="${container.cookieStoreId}" id="deleteBtn-${container.cookieStoreId}" title="Delete Container">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <button class="button action-btn delete-btn" data-container-id="${container.cookieStoreId}" id="deleteBtn-${container.cookieStoreId}" title="Delete Container" aria-label="Delete container ${container.name}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="white"/>
                             </svg>
                         </button>
@@ -368,24 +379,24 @@ class PopupManager {
                             (async function() {
                                 try {
                                     // Try ipify first
-                                    const response = await fetch('https://api.ipify.org/?format=json');
+                                    const response = await fetch('${IPIFY_API_URL}');
                                     const data = await response.json();
                                     const ip = data.ip;
-                                    
+
                                     // Get detailed location info
-                                    const ipinfoResponse = await fetch('https://ipinfo.io/' + ip + '/json');
+                                    const ipinfoResponse = await fetch('${IPINFO_API_URL}/' + ip + '/json');
                                     const info = await ipinfoResponse.json();
-                                    
+
                                     return {
                                         ip: ip,
                                         location: (info.city || '') + ', ' + (info.region || '') + ' ' + (info.country || '')
                                     };
                                 } catch (error) {
                                     console.error('IP detection error:', error);
-                                    
+
                                     // Fallback to another service
                                     try {
-                                        const response = await fetch('https://ipapi.co/json/');
+                                        const response = await fetch('${IPAPI_FALLBACK_URL}');
                                         const data = await response.json();
                                         return {
                                             ip: data.ip,
@@ -405,7 +416,7 @@ class PopupManager {
                         return result[0];
                     }
                 } catch (scriptError) {
-                    console.log('Script execution error:', scriptError);
+                    logInfo('Script execution error:', scriptError);
                 }
             }
             
@@ -429,7 +440,7 @@ class PopupManager {
                     return ipInfo;
                 }
             } catch (msgError) {
-                console.error('Error getting container info from background:', msgError);
+                console.error('[922Proxy] Error getting container info from background:', msgError);
             }
             
             // If all methods fail, show error
@@ -437,7 +448,7 @@ class PopupManager {
             this.updateContainerIP(container.cookieStoreId, fallbackInfo);
             return fallbackInfo;
         } catch (error) {
-            console.error('Error in refreshContainerIP:', error);
+            console.error('[922Proxy] Error in refreshContainerIP:', error);
             const errorInfo = { ip: 'Error', location: 'Unknown' };
             this.updateContainerIP(container.cookieStoreId, errorInfo);
             return errorInfo;
@@ -467,20 +478,20 @@ class PopupManager {
             });
             
             // Open ipinfo.io in the new container
-            await this.openInContainer(container, 'https://ipinfo.io/what-is-my-ip');
+            await this.openInContainer(container, DEFAULT_IP_CHECK_URL);
             
             // Refresh container list
             await this.loadContainers();
             
             this.showMessage('success', `Container "${containerName}" created!`);
         } catch (error) {
-            console.error('Error creating container:', error);
+            console.error('[922Proxy] Error creating container:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
 
     // Open a URL in a specific container
-    async openInContainer(container, url = 'https://ipinfo.io/what-is-my-ip') {
+    async openInContainer(container, url = DEFAULT_IP_CHECK_URL) {
         try {
             await browser.tabs.create({
                 url: url,
@@ -489,13 +500,13 @@ class PopupManager {
             
             window.close();
         } catch (error) {
-            console.error('Error opening in container:', error);
+            console.error('[922Proxy] Error opening in container:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
     
     // Switch to an existing tab in a container or create a new one if none exists
-    async switchToContainer(container, url = 'https://ipinfo.io/what-is-my-ip') {
+    async switchToContainer(container, url = DEFAULT_IP_CHECK_URL) {
         try {
             // Check if there's an existing tab with this container
             const tabs = await browser.tabs.query({
@@ -516,7 +527,7 @@ class PopupManager {
             
             window.close();
         } catch (error) {
-            console.error('Error switching to container:', error);
+            console.error('[922Proxy] Error switching to container:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
@@ -534,7 +545,7 @@ class PopupManager {
                 this.showMessage('success', `Container "${container.name}" deleted successfully`);
             }
         } catch (error) {
-            console.error('Error deleting container:', error);
+            console.error('[922Proxy] Error deleting container:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
@@ -568,7 +579,7 @@ class PopupManager {
                 this.showMessage('success', `Successfully deleted ${deleteCount} containers`);
             }
         } catch (error) {
-            console.error('Error deleting all containers:', error);
+            console.error('[922Proxy] Error deleting all containers:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
@@ -609,13 +620,10 @@ class PopupManager {
             // Update credential validation status
             this.credentialsValid = true;
             this.updateCredentialStatus();
-            
-            // Check data plan usage with new credentials
-            this.checkDataPlanUsage();
-            
+
             this.showMessage('success', 'Credentials saved successfully!');
         } catch (error) {
-            console.error('Error saving credentials:', error);
+            console.error('[922Proxy] Error saving credentials:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
@@ -644,28 +652,14 @@ class PopupManager {
             // Reset credential status
             this.credentialsValid = false;
             this.updateCredentialStatus();
-            
-            // Hide data usage section
-            document.getElementById('dataUsage').style.display = 'none';
-            
+
             this.showMessage('success', 'Successfully logged out!');
         } catch (error) {
-            console.error('Error during logout:', error);
+            console.error('[922Proxy] Error during logout:', error);
             this.showMessage('error', `Error: ${error.message}`);
         }
     }
     
-    /**
-     * Data usage functionality removed as requested
-     * This stub function is kept to avoid breaking other code that might call it
-     */
-    async checkDataPlanUsage() {
-        // Hide data usage section if it exists
-        const dataUsageElement = document.getElementById('dataUsage');
-        if (dataUsageElement) {
-            dataUsageElement.style.display = 'none';
-        }
-    }
     
     // Load proxy credentials from local storage
     async loadProxyCredentials() {
@@ -686,16 +680,11 @@ class PopupManager {
                     this.proxyGenerator.credentials = result.proxyCredentials;
                 }
             }
-            
+
             // Update the credential status UI
             this.updateCredentialStatus();
-            
-            // Check data plan usage
-            if (this.credentialsValid) {
-                this.checkDataPlanUsage();
-            }
         } catch (error) {
-            console.error('Error loading credentials:', error);
+            console.error('[922Proxy] Error loading credentials:', error);
             this.credentialsValid = false;
             this.updateCredentialStatus();
         }
@@ -715,36 +704,25 @@ class PopupManager {
         const credentialStatus = document.getElementById('credentialStatus');
         const generateBtn = document.getElementById('generateBtn');
         const downloadBtn = document.getElementById('downloadBtn');
-        const dataUsage = document.getElementById('dataUsage');
-        
+
         if (this.credentialsValid) {
             if (credentialStatus) {
                 credentialStatus.innerHTML = '<span class="success">✓ Valid credentials</span>';
                 credentialStatus.style.display = 'block';
             }
-            
+
             // Enable proxy generation buttons
             if (generateBtn) generateBtn.disabled = false;
             if (downloadBtn) downloadBtn.disabled = false;
-            
-            // Show data usage if available
-            if (dataUsage) {
-                dataUsage.style.display = 'block';
-            }
         } else {
             if (credentialStatus) {
-                credentialStatus.innerHTML = '<span class="error">⚠️ Please add your 922proxy credentials</span><br><small>Enter your API Token/Password or Username/Password to generate proxies</small>';
+                credentialStatus.innerHTML = '<span class="error">⚠️ Please add your 922proxy credentials</span><br><small>Enter your Username/Password to generate proxies</small>';
                 credentialStatus.style.display = 'block';
             }
-            
+
             // Disable proxy generation buttons
             if (generateBtn) generateBtn.disabled = true;
             if (downloadBtn) downloadBtn.disabled = true;
-            
-            // Hide data usage when no valid credentials
-            if (dataUsage) {
-                dataUsage.style.display = 'none';
-            }
         }
     }
     
@@ -763,7 +741,7 @@ class PopupManager {
         // Set up interval for periodic updates (every 30 seconds)
         this.ipUpdateInterval = setInterval(() => {
             if (this.containers && this.containers.length > 0) {
-                console.log('Performing periodic IP update...');
+                logInfo('Performing periodic IP update...');
                 this.detectContainerIPs(this.containers);
             }
         }, 30000); // 30 seconds
