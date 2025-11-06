@@ -30,3 +30,4 @@ yarn-error.log*
 # Web extension packaging
 *.zip
 *.xpi
+web-ext-artifacts/

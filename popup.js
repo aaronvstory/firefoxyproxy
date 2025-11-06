@@ -6,6 +6,10 @@ const DEFAULT_IP_CHECK_URL = 'https://ipinfo.io/what-is-my-ip';
 const IPIFY_API_URL = 'https://api.ipify.org/?format=json';
 const IPINFO_API_URL = 'https://ipinfo.io';
 const IPAPI_FALLBACK_URL = 'https://ipapi.co/json/';
+const IP_REFRESH_INTERVAL_MS = 30000; // 30 seconds
+const FLASH_DURATION_MS = 1000; // 1 second for update flash effect
+const MESSAGE_DISPLAY_DURATION_MS = 3000; // 3 seconds for success/error messages
+const RANDOM_NAME_RANGE = 1000; // Range for random proxy names
 const DEBUG = false; // Set to true for verbose logging
 
 function logInfo(message, ...args) {
@@ -192,9 +196,13 @@ class PopupManager {
     // Load and display Firefox containers
     async loadContainers() {
         try {
-            document.getElementById('loadingContainers').style.display = 'block';
-            document.getElementById('containerList').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'none';
+            const loadingElement = document.getElementById('loadingContainers');
+            const containerListElement = document.getElementById('containerList');
+            const emptyStateElement = document.getElementById('emptyState');
+
+            if (loadingElement) loadingElement.style.display = 'block';
+            if (containerListElement) containerListElement.style.display = 'none';
+            if (emptyStateElement) emptyStateElement.style.display = 'none';
             
             // Check if browser API is available
             if (typeof browser === 'undefined' || !browser.contextualIdentities) {
@@ -208,13 +216,13 @@ class PopupManager {
             
             // Update the UI
             this.updateContainerList(containers);
-            
-            document.getElementById('loadingContainers').style.display = 'none';
-            
+
+            if (loadingElement) loadingElement.style.display = 'none';
+
             if (containers.length === 0) {
-                document.getElementById('emptyState').style.display = 'block';
+                if (emptyStateElement) emptyStateElement.style.display = 'block';
             } else {
-                document.getElementById('containerList').style.display = 'block';
+                if (containerListElement) containerListElement.style.display = 'block';
             }
             
             // Start periodic IP detection (every 30 seconds)
@@ -222,13 +230,17 @@ class PopupManager {
         } catch (error) {
             console.error('[922Proxy] Error loading containers:', error);
             this.showContainerError();
-            document.getElementById('loadingContainers').style.display = 'none';
+            const loadingElement = document.getElementById('loadingContainers');
+            if (loadingElement) loadingElement.style.display = 'none';
         }
     }
 
     // Show container API error
     showContainerError() {
-        document.getElementById('containerList').innerHTML = `
+        const containerList = document.getElementById('containerList');
+        if (!containerList) return;
+
+        containerList.innerHTML = `
             <div style="background: rgba(244, 67, 54, 0.2); padding: 15px; border-radius: 6px; margin: 10px 0; text-align: center;">
                 <h3 style="margin-top: 0;">⚠️ Firefox Containers Not Available</h3>
                 <p>This extension requires Firefox Multi-Account Containers to be enabled.</p>
@@ -240,8 +252,10 @@ class PopupManager {
     // Update container list in UI
     updateContainerList(containers) {
         const containerList = document.getElementById('containerList');
+        if (!containerList) return;
+
         containerList.innerHTML = '';
-        
+
         if (containers.length === 0) {
             return;
         }
@@ -344,7 +358,7 @@ class PopupManager {
             containerRow.classList.add('updated');
             setTimeout(() => {
                 containerRow.classList.remove('updated');
-            }, 1000);
+            }, FLASH_DURATION_MS);
         }
     }
     
@@ -458,7 +472,6 @@ class PopupManager {
     // Create a new container
     async createNewContainer() {
         try {
-            // ... (rest of the code remains the same)
             // Check if browser API is available
             if (typeof browser === 'undefined' || !browser.contextualIdentities) {
                 this.showContainerError();
@@ -468,7 +481,7 @@ class PopupManager {
             // Create a random name and color
             const colors = ['blue', 'turquoise', 'green', 'yellow', 'orange', 'red', 'pink', 'purple'];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            const containerName = `Proxy ${Math.floor(Math.random() * 1000)}`;
+            const containerName = `Proxy ${Math.floor(Math.random() * RANDOM_NAME_RANGE)}`;
             
             // Create the container
             const container = await browser.contextualIdentities.create({
@@ -738,13 +751,13 @@ class PopupManager {
             this.detectContainerIPs(this.containers);
         }
         
-        // Set up interval for periodic updates (every 30 seconds)
+        // Set up interval for periodic updates
         this.ipUpdateInterval = setInterval(() => {
             if (this.containers && this.containers.length > 0) {
                 logInfo('Performing periodic IP update...');
                 this.detectContainerIPs(this.containers);
             }
-        }, 30000); // 30 seconds
+        }, IP_REFRESH_INTERVAL_MS);
         
         // Add event listener to clean up interval when popup closes
         window.addEventListener('unload', () => {
@@ -758,23 +771,28 @@ class PopupManager {
     showMessage(type, message) {
         const successMsg = document.getElementById('successMsg');
         const errorMsg = document.getElementById('errorMsg');
-        
+
+        if (!successMsg || !errorMsg) {
+            console.error('[922Proxy] Message elements not found');
+            return;
+        }
+
         if (type === 'success') {
             successMsg.textContent = message;
             successMsg.style.display = 'block';
             errorMsg.style.display = 'none';
-            
+
             setTimeout(() => {
                 successMsg.style.display = 'none';
-            }, 3000);
+            }, MESSAGE_DISPLAY_DURATION_MS);
         } else {
             errorMsg.textContent = message;
             errorMsg.style.display = 'block';
             successMsg.style.display = 'none';
-            
+
             setTimeout(() => {
                 errorMsg.style.display = 'none';
-            }, 3000);
+            }, MESSAGE_DISPLAY_DURATION_MS);
         }
     }
 }

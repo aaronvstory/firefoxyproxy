@@ -1,7 +1,11 @@
 // Background Script for 922Proxy FoxyProxy Generator
 // Version 3.0
 
+// Constants
 const DEBUG = false; // Set to true for verbose logging
+const DEFAULT_PROXY_PORT = 6200;
+const DEFAULT_PROXY_COUNT = 10;
+const RANDOM_NAME_RANGE = 1000;
 
 function logInfo(message, ...args) {
     if (DEBUG) console.log(`[922Proxy] ${message}`, ...args);
@@ -46,9 +50,9 @@ class ProxyManager {
                     username: '', // user-supplied
                     password: '', // user-supplied
                     endpoint: 'na.proxys5.net',
-                    port: 6200,
+                    port: DEFAULT_PROXY_PORT,
                     region: 'US',
-                    proxyCount: 10
+                    proxyCount: DEFAULT_PROXY_COUNT
                 };
                 await this.saveConfig();
             }
@@ -264,7 +268,7 @@ class ProxyManager {
         }
         
         return await browser.contextualIdentities.create({
-            name: name || `Proxy ${Math.floor(Math.random() * 1000)}`,
+            name: name || `Proxy ${Math.floor(Math.random() * RANDOM_NAME_RANGE)}`,
             color: color,
             icon: icon
         });

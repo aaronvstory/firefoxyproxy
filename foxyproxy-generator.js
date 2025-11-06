@@ -1,14 +1,20 @@
 // FoxyProxy Configuration Generator for 922proxy
 // Generates proper FoxyProxy JSON configuration with multiple proxies
 
+// Constants
+const DEFAULT_PROXY_PORT = '6200';
+const DEFAULT_PROXY_COUNT = 10;
+const DEFAULT_SESSION_TIME_MINUTES = 15;
+const CLEANUP_DELAY_MS = 100;
+
 class FoxyProxyGenerator {
   constructor(config = {}) {
     // Default configuration with original working values
     this.config = Object.assign({
       endpoint: 'na.proxys5.net',  // Original working endpoint
-      port: '6200',               // Original working port
+      port: DEFAULT_PROXY_PORT,
       region: 'US',               // USA region
-      proxyCount: 10              // Default number of proxies
+      proxyCount: DEFAULT_PROXY_COUNT
     }, config);
     
     // Credentials object (only username/password). Values should be provided
@@ -62,13 +68,18 @@ class FoxyProxyGenerator {
     const sessionId = this.generateSessionId();
     const colorIndex = index % this.colors.length;
     const iconIndex = index % this.icons.length;
-    
+
     // Get credentials provided by the user
-    let username = this.credentials.username;
-    let password = this.credentials.password;
-    
+    const username = this.credentials.username || '';
+    const password = this.credentials.password || '';
+
+    // Validate credentials
+    if (!username || !password) {
+      throw new Error('Username and password are required to generate proxy configuration');
+    }
+
     // Ensure correct username format with session ID for uniqueness
-    const authUsername = `${username}-region-${this.config.region}-sessid-${sessionId}-sessTime-15`;
+    const authUsername = `${username}-region-${this.config.region}-sessid-${sessionId}-sessTime-${DEFAULT_SESSION_TIME_MINUTES}`;
     
     // Create the proxy configuration object with simple numbering and unique icon
     return {
@@ -145,7 +156,7 @@ class FoxyProxyGenerator {
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 100);
+    }, CLEANUP_DELAY_MS);
     
     return true;
   }
